@@ -5,3 +5,5 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
+Route::post('/product/save', [ProductController::class, 'save'])->name('products.save');
+Route::post('product/{id}/update', [ProductController::class, 'update'])->name('product.update');
