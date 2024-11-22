@@ -38,14 +38,16 @@
                         <th>Total Value</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                <tbody id="productList">
+                    @foreach ($products as $product)
+                        <tr data-id="{{ $product['id'] }}">
+                            <td>{{ $product['name'] }}</td>
+                            <td class="text-center">{{ $product['quantity'] }}</td>
+                            <td class="text-end">{{ number_format($product['price'], 2) }}</td>
+                            <td>{{ \Carbon\Carbon::parse($product['date_submitted'])->format('M d, Y h:i A') ?? '' }}</td>
+                            <td class="text-end">{{ number_format($product['quantity'] * $product['price'], 2) }}</td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </main>
@@ -56,6 +58,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const productForm = document.getElementById('productForm');
+            const productList = document.getElementById('productList');
 
             productForm.addEventListener('submit', (event) => {
                 event.preventDefault();
@@ -79,12 +82,35 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log(data);
+                        listProducts(data.products);
                     })
                     .catch(error => {
                         console.error(error);
                     });
 
             });
+
+            function listProducts(products) {
+                productList.innerHTML = '';
+                products.forEach(product => {
+                    const row = `
+                        <tr data-id="${product.id}">
+                            <td>${product.name}</td>
+                            <td>${product.quantity}</td>
+                            <td>${product.price}</td>
+                            <td>${new Date(product.date_submitted).toLocaleString('en-US', {
+                                dateStyle: 'medium',
+                                timeStyle: 'short',
+                                timezone: 'UTC'
+                            })}
+                            </td>
+                            <td>${product.quantity * product.price}</td>
+                        </tr>
+                    `;
+                    productList.insertAdjacentHTML('beforeend', row);
+                });
+
+            }
         });
     </script>
 @endsection
