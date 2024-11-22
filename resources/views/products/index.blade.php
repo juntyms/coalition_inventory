@@ -98,7 +98,7 @@
             productList.addEventListener('click', (event) => {
                 if (event.target.id === 'edit-btn') {
                     const productId = event.target.dataset.id;
-                    console.log(productId);
+                    //console.log(productId);
                     fetch(`/product/${productId}/edit`)
                         .then(response => response.json())
                         .then(data => {
