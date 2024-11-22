@@ -36,11 +36,16 @@ class ProductController extends Controller
             'date_submitted' => now()
         ];
 
-        Storage::put($this->jsonFilePath, json_encode($product, JSON_PRETTY_PRINT));
 
+        $this->saveProduct($product);
 
 
         return response()->json(['success' => true, 'message' => 'Product saved!', 'products' => $product]);
+    }
+
+    private function saveProduct(array $products)
+    {
+        Storage::put($this->jsonFilePath, json_encode($products, JSON_PRETTY_PRINT));
     }
 
     private function listproducts()
@@ -58,5 +63,37 @@ class ProductController extends Controller
         return $products;
     }
 
-    public function update(Request $request, $id) {}
+    public function edit($id)
+    {
+
+        $products = $this->listproducts();
+
+        $product = collect($products)->firstwhere('id', $id);
+
+        return response()->json(['product' => $product]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'quantity' => 'required|integer',
+            'price' => 'required|numeric',
+        ]);
+
+        $products = $this->listproducts();
+
+        $products = collect($products)->map(function ($product) use ($request, $id) {
+            if ($product['id'] == $id) {
+                $product['name'] = $request->name;
+                $product['quantity'] = $request->quantity;
+                $product['price'] = $request->price;
+            }
+            return $product;
+        })->toArray();
+
+        $this->saveProduct($products);
+
+        return response()->json(['success' => true, 'message' => 'Product updated!', 'products' => $products]);
+    }
 }

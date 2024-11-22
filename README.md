@@ -1,3 +1,8 @@
+## Repository
+https://github.com/juntyms/coalition_inventory
+
 ## Setting Up
 
-`` php artisan storage:link ``
+` composer update `
+
+` php artisan storage:link `

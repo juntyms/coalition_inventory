@@ -9,7 +9,7 @@
             <div class="col-md-7">
                 <form id="productForm">
                     @csrf
-                    <input type="hidden" id="productId" />
+                    <input type="hidden" name="productId" id="productId" />
                     <div class="form-group">
                         <label for="name">Product Name</label>
                         <input type="text"name="name" id="name" class="form-control" required />
@@ -36,6 +36,7 @@
                         <th>Price Per Item</th>
                         <th>Datetime submitted</th>
                         <th>Total Value</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="productList">
@@ -46,6 +47,9 @@
                             <td class="text-end">{{ number_format($product['price'], 2) }}</td>
                             <td>{{ \Carbon\Carbon::parse($product['date_submitted'])->format('M d, Y h:i A') ?? '' }}</td>
                             <td class="text-end">{{ number_format($product['quantity'] * $product['price'], 2) }}</td>
+                            <td>
+                                <button class="btn btn-info" id="edit-btn" data-id="{{ $product['id'] }}"> Edit</button>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -66,9 +70,9 @@
                 const formData = new FormData(productForm);
                 const data = Object.fromEntries(formData);
 
-                console.log(data['productId']);
+                //console.log(data['productId']);
 
-                const url = data['productId'] ? `product/{id}/update` : '/product/save';
+                const url = data['productId'] ? `product/${data['productId']}/update` : '/product/save';
                 const method = 'POST';
 
                 fetch(url, {
@@ -90,6 +94,24 @@
 
             });
 
+            productList.addEventListener('click', (event) => {
+                if (event.target.id === 'edit-btn') {
+                    const productId = event.target.dataset.id;
+                    console.log(productId);
+                    fetch(`/product/${productId}/edit`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.product) {
+                                document.getElementById('productId').value = data.product.id;
+                                document.getElementById('name').value = data.product.name;
+                                document.getElementById('quantity').value = data.product.quantity;
+                                document.getElementById('price').value = data.product.price;
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            });
+
             function listProducts(products) {
                 productList.innerHTML = '';
                 products.forEach(product => {
@@ -105,6 +127,7 @@
                             })}
                             </td>
                             <td>${product.quantity * product.price}</td>
+                            <td><button class="btn btn-info" id="edit-btn" data-id="${product.id}"> Edit</button></td>
                         </tr>
                     `;
                     productList.insertAdjacentHTML('beforeend', row);
