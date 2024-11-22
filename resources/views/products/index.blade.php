@@ -11,32 +11,32 @@
                     @csrf
                     <input type="hidden" name="productId" id="productId" />
                     <div class="form-group">
-                        <label for="name">Product Name</label>
+                        <label for="name">{{ __('Product Name') }}</label>
                         <input type="text"name="name" id="name" class="form-control" required />
                     </div>
                     <div class="form-group">
-                        <label for="quantity">Quantity in Stock</label>
+                        <label for="quantity">{{ __('Quantity in Stock') }}</label>
                         <input type="number" name="quantity" id="quantity" class="form-control" required />
                     </div>
                     <div class="form-group">
-                        <label for="price">Price per Item</label>
+                        <label for="price">{{ __('Price per Item') }}</label>
                         <input type="number" name="price" id="price" class="form-control" required />
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-3"> Save</button>
+                    <button type="submit" class="btn btn-primary mt-3"> {{ __('Save') }}</button>
 
                 </form>
             </div>
             <hr />
-            <table class="table table-bordered">
+            <table class="table table-bordered ">
                 <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Quantity in Stock</th>
-                        <th>Price Per Item</th>
-                        <th>Datetime submitted</th>
-                        <th>Total Value</th>
-                        <th>Action</th>
+                    <tr class="table-primary">
+                        <th>{{ __('Product Name') }}</th>
+                        <th>{{ __('Quantity in Stock') }}</th>
+                        <th>{{ __('Price Per Item') }}</th>
+                        <th>{{ __('Datetime submitted') }}</th>
+                        <th>{{ __('Total Value') }}</th>
+                        <th>{{ __('Action') }}</th>
                     </tr>
                 </thead>
                 <tbody id="productList">
@@ -48,7 +48,8 @@
                             <td>{{ \Carbon\Carbon::parse($product['date_submitted'])->format('M d, Y h:i A') ?? '' }}</td>
                             <td class="text-end">{{ number_format($product['quantity'] * $product['price'], 2) }}</td>
                             <td>
-                                <button class="btn btn-info" id="edit-btn" data-id="{{ $product['id'] }}"> Edit</button>
+                                <button class="btn btn-info" id="edit-btn" data-id="{{ $product['id'] }}">
+                                    {{ __('Edit') }}</button>
                             </td>
                         </tr>
                     @endforeach
@@ -71,7 +72,6 @@
                 const data = Object.fromEntries(formData);
 
                 //console.log(data['productId']);
-
                 const url = data['productId'] ? `product/${data['productId']}/update` : '/product/save';
                 const method = 'POST';
 
@@ -85,8 +85,9 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
+                        alert(data.message);
                         listProducts(data.products);
+                        productForm.reset();
                     })
                     .catch(error => {
                         console.error(error);
